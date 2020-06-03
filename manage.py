@@ -68,7 +68,7 @@ def start(args):
     run_shell("kubectl create -f ./deploy/random-log-counter.yaml")
 
     # Deploy Litmus ChaosOperator to run Experiments that create incidents
-    run_shell("kubectl apply -f https://litmuschaos.github.io/pages/litmus-operator-v1.4.1.yaml")
+    run_shell("kubectl apply -f https://litmuschaos.github.io/pages/litmus-operator-v1.4.0.yaml")
 
     # Install Litmus Experiments - TEMP Workaround to set experiment versions until Chaos Hub supports in URL
     run_shell("curl -sL https://github.com/litmuschaos/chaos-charts/archive/1.4.1.tar.gz -o litmus.tar.gz")
