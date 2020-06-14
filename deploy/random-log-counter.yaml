@@ -4,7 +4,7 @@ kind: Namespace
 metadata:
   name: random-counter
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: random-counter
@@ -13,6 +13,9 @@ metadata:
   namespace: random-counter
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      name: random-counter
   template:
     metadata:
       labels:

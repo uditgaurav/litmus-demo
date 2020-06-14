@@ -28,9 +28,13 @@ spec:
               value: "carts-db"
             # specify the fill percentage according to the disk pressure required
             - name: FILL_PERCENTAGE
-              value: "120"
+              value: "80"
             # 5 minute duration in seconds
             - name: TOTAL_CHAOS_DURATION
-              value: "300"
+              value: "60"
             - name: DEFAULT_GATHERING
               value: "explicit"
+            # Provide the container runtime path
+            # Default set to docker
+            - name: CONTAINER_PATH
+              value: '/var/lib/docker/containers'              

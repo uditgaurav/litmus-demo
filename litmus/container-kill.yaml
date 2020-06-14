@@ -28,3 +28,12 @@ spec:
               value: carts-db
             - name: DEFAULT_GATHERING
               value: "explicit"
+            - name: LIB_IMAGE  
+              value: 'litmuschaos/container-kill-helper:latest'               
+            - name: LIB
+              value: 'containerd'
+            - name: CHAOS_INTERVAL
+              value: '10'
+            - name: TOTAL_CHAOS_DURATION
+              value: '50'
+

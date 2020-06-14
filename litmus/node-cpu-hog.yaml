@@ -29,5 +29,5 @@ spec:
               value: '60'
             
             - name: NODE_CPU_CORE
-              value: ''
+              value: '2'
   

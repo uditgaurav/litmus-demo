@@ -1,18 +1,14 @@
 # Litmus Kubernetes Demo Environment
 
-The purpose of this repository is to familiarize oneself with running litmus chaos experiments in a realistic app environment running multiple services on a Kubernetes cluster. This repo is forked from the [zebrium kubernetes demo](https://github.com/zebrium/zebrium-kubernetes-demo) which is very similar to what is detailed here plus the setup of the zebrium automated incident detection framework. 
+The purpose of this repository is to familiarize oneself with running litmus chaos experiments in a realistic app environment running multiple services on different Kubernetes clusters. 
 
-It makes it easy to spin up a fully deployed [GKE](https://cloud.google.com/kubernetes-engine/) cluster with a microservice application 
+It makes to spin up a fully deployed [GKE](https://cloud.google.com/kubernetes-engine/) cluster easy with a microservice application or even you can spin up a KinD (Kubernetes-in-Docker) cluster which is a lightweight easy to use and handle for the applications and performing chaos.
 [Sock Shop](https://github.com/microservices-demo/microservices-demo), and 
 [Litmus Chaos Engine](https://litmuschaos.io/) to create chaos scenarios.
 
-For more background, please read [Using Autonomous Monitoring with Litmus Chaos Engine on Kubernetes](https://www.zebrium.com/blog/using-autonomous-monitoring-with-litmus-chaos-engine-on-kubernetes?utm_campaign=Chaos&utm_source=chaos&utm_medium=github).
-
-![Deployed Services](https://www.zebrium.com/hs-fs/hubfs/Zebrium%20and%20Litmus%20Chaos%20Engine%20components.png?width=1461&name=Zebrium%20and%20Litmus%20Chaos%20Engine%20components.png)
-
 After cloning this repository, installing the requirements listed below, and using the `start` command to create the fully deployed cluster, you will be able to run Litmus Chaos experiments using the `test` command in the cluster. You can find all the experiment configuration under the `/litmus` directory of this repository and the script to deploy and run them in `manage.py`.
 
-It currently only works with GKE so you will need a Google Cloud account to run this environment, but support for Amazon and Azure is planned in future.
+It currently works with KinD and GKE so either you can use a KinD cluster by following the below steps or you would need a Google Cloud account to run this on GKE environment and the support for Amazon and Azure is planned in future.
 
 ## Requirements
 
@@ -22,11 +18,12 @@ It currently only works with GKE so you will need a Google Cloud account to run 
 4. GCloud CLI installed locally and logged in: https://cloud.google.com/sdk/docs/quickstarts
 5. Kubectl installed locally: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 6. Helm installed locally: https://helm.sh/docs/intro/install/
+7. Docker installed locally: https://docs.docker.com/engine/install/
 
 
 ## Usage
 
-To see full command line options use the `-h` flag:
+To see full command-line options use the `-h` flag:
 
 ```bash
 ./manage.py -h
@@ -35,29 +32,63 @@ To see full command line options use the `-h` flag:
 This will output the following:
 
 ```bash
-usage: manage.py [-h] {start,test,stop} ...
+usage: manage.py [-h] {start,test,list,stop} ...
 
 Spin up Litmus Demo Environment on Kubernetes.
 
-positional arguments:
+positional arguments:**
   {start,test,list,stop}
-    start               Start a GKE Cluster with demo environment
-                        deployed.
-    test                Run Litmus ChaosEngine Experiments inside
-                        demo environment.
+    start               Start a Cluster with the demo environment deployed.
+    test                Run Litmus ChaosEngine Experiments inside litmus demo
+                        environment.
     list                List all available Litmus ChaosEngine Experiments
                         available to run.
-    stop                Shutdown the GKE Cluster with demo
-                        environment deployed.
+    stop                Shutdown the Cluster with the demo environment
+                        deployed.
 ```
 
 ## Startup
 
 To start the GKE cluster and deploy all the required components:
 
+**_for kind cluster_**
 ```bash
-./manage.py start --project {GC_PROJECT} --key {ZE_KEY}
+./manage.py start --platform kind 
 ```
+
+**_for GKE cluster_**
+```bash
+./manage.py start --platform GKE --project {GC_PROJECT} --key {ZE_KEY}
+```
+
+**Flag values for start**
+<table>
+<tr>
+<th> Flag </th>
+<th> Description </th>
+<th> Default </th>
+</tr>
+<tr>
+ <td> <code>--platform</code> or <code>-pt</code>  </td>
+ <td> Set the platform to start with demo enviroment. Available platforms are kind and GKE. Support for other platforms will also be added. </td>
+ <td>  Default value is <code>kind</code></td>
+ </tr>
+<tr>
+ <td> <code>--name</code> or <code>-n</code> </td>
+ <td> Required when <code>--platform</code> is GKE. It sets GKE cluster name </td>
+ <td>  Default value is <code>litmus-k8s-demo</code></td>
+ </tr>
+<tr>
+ <td> <code>--zone</code> or <code>-z</code> </td>
+ <td> Required when <code>--platform</code> is GKE. It sets GCloud Zone to spin GKE cluster up in </td>
+ <td>  Default value is <code>us-central1-a</code></td>
+ </tr>
+ <tr>
+ <td> <code>--project</code> or <code>-p</code> </td>
+ <td> Required when <code>--platform</code> is GKE. It sets GCloud Project to spin GKE cluster up in </td>
+ <td>  No Default value</td>
+ </tr>
+ </table>
 
 ## Test
 
@@ -66,14 +97,43 @@ To run all the Litmus ChaosEngine experiments:
 ```bash
 ./manage.py test
 ```
-You can optionaly add the `--wait=` argument to change the wait time between experiments in minutes. By default
+You can optionally add the `--wait=` argument to change the wait time between experiments in minutes. By default,
 it is 1 min.
 
 To run a specific experiment (found under the ./litmus directory):
 
 ```bash
-./manage.py test --test=container-kill
+./manage.py test --test=pod-delete
 ```
+
+**Flag values for test**
+<table>
+<tr>
+<th> Flag </th>
+<th> Description </th>
+<th> Default </th>
+</tr>
+<tr>
+ <td> <code>--test</code> or <code>-t</code>  </td>
+ <td> Name of test to run based on yaml file name under /litmus folder. </td>
+ <td>  Default value is <code>*</code> (all)</td>
+ </tr>
+<tr>
+ <td> <code>--wait</code> or <code>-w</code> </td>
+ <td> Number of minutes to wait between experiments. </td>
+ <td>  Default value is <code>1</code> (in min)</td>
+ </tr>
+<tr>
+ <td> <code>--type</code> or <code>-ty</code> </td>
+ <td> Select the type of chaos to be performed, it can have values pod for pod level chaos,node for infra/node level chaos and all to perform all chaos. </td>
+ <td>  Default value is <code>all</code> </td>
+ </tr>
+ <tr>
+ <td> <code>--platform</code> or <code>-pt</code> </td>
+ <td> Set the platform to perform chaos. Available platforms are kind and GKE. </td>
+ <td> Default value is <code>kind</code></td>
+ </tr>
+ </table>
 
 ### Notes
 
@@ -83,7 +143,7 @@ To run a specific experiment (found under the ./litmus directory):
 kubectl logs -f chaos-operator-ce-6899bbdb9-jz6jv -n litmus  
 ```
 
-- To view the parameters with which the experiment job is created, status of experiment, success of chaosengine patch operation and cleanup of the experiment pod, check the logs of the chaos-runner pod. Ex:
+- To view the parameters with which the experiment job is created, the status of experiment, the success of chaosengine patch operation, and cleanup of the experiment pod, check the logs of the chaos-runner pod. Ex:
 
 ```bash
 kubectl logs sock-chaos-runner -n sock-shop
@@ -106,16 +166,22 @@ kubectl apply -f litmus/chaosengine.yaml
 
 ## List
 
-Lists all the available Litmus Chaos Experiments in this repo under the `./litmus` directory:
+Lists all the available Litmus Chaos Experiments in this repo under the `./litmus` directory for a particular platform:
 
 ```bash
-./manage.py list
+./manage.py list --platform <platform-name>
 ```
 
 ## Shutdown
 
-To shutdown and destroy the GKE cluster when you're finished:
+To shut down and destroy the cluster when you're finished:
 
+**_for kind cluster_**
+``` bash
+./manage.py --platform kind stop
+```
+
+**_for GKE cluster_**
 ```bash
-./manage.py stop --project {GC_PROJECT}
+./manage.py --platform GKE stop --project {GC_PROJECT}
 ```
