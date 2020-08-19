@@ -249,7 +249,7 @@ def test(args):
 
     #for kind platform
     if ((f"{args.platform}" == "kind") and (f"{args.type}" == "all")):
-        kind_supported = ["pod-delete","container-kill""node-cpu-hog","node-memory-hog","disk-fill"]
+        kind_supported = ["pod-delete","container-kill","node-cpu-hog","node-memory-hog","disk-fill"]
         experiments=[s + ".yaml" for s in kind_supported]
 
     elif ((f"{args.platform}" == "kind") and (f"{args.type}" == "pod")):
