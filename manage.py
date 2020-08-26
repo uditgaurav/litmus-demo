@@ -8,6 +8,10 @@ import time
 from datetime import datetime
 import subprocess
 import yaml
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import LETTER
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Image
+from reportlab.lib.styles import getSampleStyleSheet
 
 class bcolors:
     HEADER = '\033[95m'
@@ -185,7 +189,7 @@ def run_experiment(experiment: str):
 
     :param experiment:  The name of the experiment as defined in the YAML, i.e. container-kill
     :return:            ExperimentResult object with results of experiment
-    """
+    """ 
     print_color("***************************************************************************************************", bcolors.OKBLUE)
     print_color(f"* {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Experiment: {experiment}", bcolors.OKBLUE)
     print_color("***************************************************************************************************", bcolors.OKBLUE)
@@ -211,7 +215,7 @@ def run_experiment(experiment: str):
     logs_cmd = f"kubectl logs --since=10s -l name={experiment} -n {namespace}"
     print(f"\n{bcolors.OKGREEN}//** Experiment Logs ({logs_cmd}) **//\n\n")
     try:
-        while subprocess.check_output(expStatusCmd, shell=True).decode('unicode-escape') != "Execution Successful":
+        while subprocess.check_output(expStatusCmd, shell=True).decode('unicode-escape') != "Completed":
             os.system(logs_cmd)
             os.system("sleep 10")
 
@@ -236,7 +240,7 @@ def test(args):
     but by default all '*' experiments will be run with 20 minute wait period between each experiment
     to ensure that it doesn't cluster the incidents together into one incident
     """
-
+    startTimeStamp = time.monotonic()
     #for GKE platform
     if (f"{args.platform}" == "GKE" and (f"{args.type}" == "all")):
         experiments = sorted(os.listdir('./litmus'))
@@ -249,7 +253,7 @@ def test(args):
 
     #for kind platform
     if ((f"{args.platform}" == "kind") and (f"{args.type}" == "all")):
-        kind_supported = ["pod-delete","container-kill","node-cpu-hog","node-memory-hog","disk-fill"]
+        kind_supported = ["pod-delete","container-kill","node-cpu-hog","node-memory-hog"]
         experiments=[s + ".yaml" for s in kind_supported]
 
     elif ((f"{args.platform}" == "kind") and (f"{args.type}" == "pod")):
@@ -291,12 +295,87 @@ def test(args):
     i = 1
     for result in experiment_results:
         if result.status == "Pass":
-            print_color(row_format.format("", str(i), result.startTime.strftime('%Y-%m-%d %H:%M:%S'), result.name,"    "+ result.status + " 'carts-db' Service \nis up and Running after chaos"), bcolors.OKBLUE)
+            print_color(row_format.format("", str(i), result.startTime.strftime('%Y-%m-%d %H:%M:%S'), result.name,"    "+ result.status + " 'carts-db' Service is up and Running after chaos"), bcolors.OKBLUE)
             i += 1
         else:
             print_color(row_format.format("", str(i), result.startTime.strftime('%Y-%m-%d %H:%M:%S'), result.name, result.status), bcolors.OKBLUE)
             i += 1
     print("\n")
+    currentTimeStamp= time.monotonic()
+    diffTimeStamp = currentTimeStamp - startTimeStamp
+    ty_res = time.gmtime(diffTimeStamp)
+    totalTime = time.strftime("%H:%M:%S",ty_res)
+
+    if (f"{args.report}" == "yes"):
+        
+        print_color("Creating PDF Report", bcolors.OKBLUE)
+
+        fileName = 'chaos-report.pdf'
+        pdf = SimpleDocTemplate(fileName,pagesize=LETTER)
+        styles = getSampleStyleSheet()
+        data = [None]
+        data[0] = ["S.No.", "Start Time", "Experiment", "Status"]
+
+        i =1
+        expPassed = 0
+        expFailed = 0
+        for result in experiment_results:
+            if result.status == "Pass":
+                data.append([str(i), result.startTime.strftime('%Y-%m-%d %H:%M:%S'), result.name,"    "+ result.status + " 'carts-db' Service is up and Running after chaos"])
+                i += 1
+                expPassed +=1
+            else:
+                data.append([str(i), result.startTime.strftime('%Y-%m-%d %H:%M:%S'), result.name,result.status])
+                i += 1
+                expFailed +=1
+    
+        table = Table(data)
+
+        picture = Image("images/litmus.png")
+        picture.drawWidth = 100
+        picture.drawHeight = 100
+        picTable = Table([[picture]],100,100)
+
+        elems = []
+
+        # Adding logo
+        elems.append(picTable)
+        # Adding title
+        text = "LitmusChaos Report <br/> <br/>Experiments Result Summary"
+        para = Paragraph(text, styles['Title'])
+        elems.append(para)
+
+        ## Adding result table
+        elems.append(table)
+
+        style = TableStyle([
+            ('BACKGROUND',(0,0),(3,0), colors.green),
+            ('TEXTCOLOR',(0,0),(-1,0), colors.whitesmoke),
+            ('ALIGN',(0,0),(-1,-1), 'CENTER'),
+            ('FONTNAME',(0,0),(-1,0), 'Courier'),
+            ('FONTSIZE',(0,0),(-1,0), 14),
+            ('BOTTOMPADDING',(0,0),(-1,0), 12),
+            ('BACKGROUND',(0,1),(-1,-1), colors.beige),
+        ])
+
+        ts = TableStyle([
+            ('BOX',(0,0),(-1,-1),1,colors.black)
+        ])
+
+        ## Adding table style
+        table.setStyle(style)
+        table.setStyle(ts)
+
+        para1 = Paragraph("The total number of passed experiments: %s " % str(expPassed), styles['Heading3'])
+        elems.append(para1)
+        para2 = Paragraph("The total number of failed experiments: %s " % str(expFailed), styles['Heading3'])
+        elems.append(para2)
+        para3 = Paragraph("The total experiment execution time: %s (HH:MM:SS)" % str(totalTime), styles['Heading3'])
+        elems.append(para3)
+
+        pdf.build(elems)
+        print_color("PDF Report Created Successfully ", bcolors.OKBLUE)
+
 
 def list(args):
     """
@@ -344,7 +423,9 @@ if __name__ == "__main__":
     parser_test.add_argument("-pt", "--platform", type=str, default="kind",
                              help="Set the platform to perform chaos. Available platforms are kind and GKE. Default value is kind")                        
     parser_test.add_argument("-ty", "--type", type=str, default="all",
-                             help="Select the type of chaos to be performed, it can have values pod for pod level chaos,node for infra/node level chaos and all to perform all chaos") 
+                             help="Select the type of chaos to be performed, it can have values pod for pod level chaos,node for infra/node level chaos and all to perform all chaos")
+    parser_test.add_argument("-r", "--report", type=str, default="no",
+                             help="Select yes to generate the pdf report of the chaos result of different experiment execution")
     parser_test.set_defaults(func=test)
 
     # List Tests Command

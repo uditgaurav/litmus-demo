@@ -133,6 +133,11 @@ To run a specific experiment (found under the ./litmus directory):
  <td> Set the platform to perform chaos. Available platforms are kind and GKE. </td>
  <td> Default value is <code>kind</code></td>
  </tr>
+  <tr>
+ <td> <code>--report</code> or <code>-r</code> </td>
+ <td> Set report flag to yes for generating pdf report of the experiment result summary </td>
+ <td> Default value is <code>no</code></td>
+ </tr>
  </table>
 
 ### Notes
@@ -164,6 +169,15 @@ kubectl delete chaosengine sock-chaos -n sock-shop
 kubectl apply -f litmus/chaosengine.yaml 
 ```
 
+## Generate PDF of the experiment result summary
+
+We can also generate the pdf report of the experiment result summary using <code>--report</code> flag as follow:
+
+```bash
+./manage.py test --report=yes
+``` 
+It will generate a pdf report of name `chaos-report.pdf` in the current location containing chaos result summary.
+
 ## List
 
 Lists all the available Litmus Chaos Experiments in this repo under the `./litmus` directory for a particular platform:
@@ -171,6 +185,7 @@ Lists all the available Litmus Chaos Experiments in this repo under the `./litmu
 ```bash
 ./manage.py list --platform <platform-name>
 ```
+
 
 ## Shutdown
 
