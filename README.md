@@ -2,13 +2,13 @@
 
 The purpose of this repository is to familiarize oneself with running litmus chaos experiments in a realistic app environment running multiple services on different Kubernetes clusters. 
 
-It makes to spin up a fully deployed [GKE](https://cloud.google.com/kubernetes-engine/) cluster easy with a microservice application or even you can spin up a KinD (Kubernetes-in-Docker) cluster which is a lightweight easy to use and handle for the applications and performing chaos.
+It makes to spin up a fully deployed [GKE](https://cloud.google.com/kubernetes-engine/) cluster or [EKS](https://aws.amazon.com/eks/) cluster easy with a microservice application or even you can spin up a KinD (Kubernetes-in-Docker) cluster which is a lightweight easy to use and handle for the applications and performing chaos.
 [Sock Shop](https://github.com/microservices-demo/microservices-demo), and 
 [Litmus Chaos Engine](https://litmuschaos.io/) to create chaos scenarios.
 
 After cloning this repository, installing the requirements listed below, and using the `start` command to create the fully deployed cluster, you will be able to run Litmus Chaos experiments using the `test` command in the cluster. You can find all the experiment configuration under the `/litmus` directory of this repository and the script to deploy and run them in `manage.py`.
 
-It currently works with KinD and GKE so either you can use a KinD cluster by following the below steps or you would need a Google Cloud account to run this on GKE environment and the support for Amazon and Azure is planned in future.
+It currently works with KinD, GKE and EKS so either you can use a KinD cluster by following the below steps or you would need a Google Cloud account to run this on GKE environment or an AWS account to run this on EKS environment and the support for Azure is planned in future.
 
 ## Requirements
 
@@ -16,9 +16,13 @@ It currently works with KinD and GKE so either you can use a KinD cluster by fol
 2. Python Dependencies: `pip install -r requirements.txt`
 3. Google Cloud Login: https://console.cloud.google.com/
 4. GCloud CLI installed locally and logged in: https://cloud.google.com/sdk/docs/quickstarts
-5. Kubectl installed locally: https://kubernetes.io/docs/tasks/tools/install-kubectl/
-6. Helm installed locally: https://helm.sh/docs/intro/install/
-7. Docker installed locally: https://docs.docker.com/engine/install/
+5. AWS CLI installed locally and logged in: https://aws.amazon.com/cli/
+6. eksctl installed locally: https://eksctl.io/
+7. Minimum IAM permissions for your AWS user: https://eksctl.io/usage/minimum-iam-policies/
+8. `create-policy` IAM permissions for your AWS user to create the AWS ALB Ingress Controller IAM policy
+9. Kubectl installed locally: https://kubernetes.io/docs/tasks/tools/install-kubectl/
+10. Helm installed locally: https://helm.sh/docs/intro/install/
+11. Docker installed locally: https://docs.docker.com/engine/install/
 
 
 ## Usage
@@ -59,6 +63,10 @@ To start the GKE cluster and deploy all the required components:
 **_for GKE cluster_**
 ```bash
 ./manage.py start --platform GKE --project {GC_PROJECT} --key {ZE_KEY}
+```
+**_for EKS cluster_**
+```bash
+./manage.py start --platform EKS --name {EKS_CLUSTER_NAME}
 ```
 
 **Flag values for start**
@@ -199,4 +207,9 @@ To shut down and destroy the cluster when you're finished:
 **_for GKE cluster_**
 ```bash
 ./manage.py --platform GKE stop --project {GC_PROJECT}
+```
+
+**_for EKS cluster_**
+```bash
+./manage.py --platform EKS stop --name {EKS_CLUSTER_NAME} --awsregion {EKS_REGION_NAME}
 ```
