@@ -1,9 +1,9 @@
 # Litmus Kubernetes Demo Environment
 
-The purpose of this repository is to familiarize oneself with running litmus chaos experiments in a realistic app environment running multiple services on different Kubernetes clusters. 
+The purpose of this repository is to familiarize oneself with running litmus chaos experiments in a realistic app environment running multiple services on different Kubernetes clusters.
 
 It makes to spin up a fully deployed [GKE](https://cloud.google.com/kubernetes-engine/) cluster or [EKS](https://aws.amazon.com/eks/) cluster easy with a microservice application or even you can spin up a KinD (Kubernetes-in-Docker) cluster which is a lightweight easy to use and handle for the applications and performing chaos.
-[Sock Shop](https://github.com/microservices-demo/microservices-demo), and 
+[Sock Shop](https://github.com/microservices-demo/microservices-demo), and
 [Litmus Chaos Engine](https://litmuschaos.io/) to create chaos scenarios.
 
 After cloning this repository, installing the requirements listed below, and using the `start` command to create the fully deployed cluster, you will be able to run Litmus Chaos experiments using the `test` command in the cluster. You can find all the experiment configuration under the `/litmus` directory of this repository and the script to deploy and run them in `manage.py`.
@@ -25,39 +25,13 @@ It currently works with KinD, GKE and EKS so either you can use a KinD cluster b
 11. Docker installed locally: https://docs.docker.com/engine/install/
 
 
-## Usage
-
-To see full command-line options use the `-h` flag:
-
-```bash
-./manage.py -h
-```
-
-This will output the following:
-
-```bash
-usage: manage.py [-h] {start,test,list,stop} ...
-
-Spin up Litmus Demo Environment on Kubernetes.
-
-positional arguments:**
-  {start,test,list,stop}
-    start               Start a Cluster with the demo environment deployed.
-    test                Run Litmus ChaosEngine Experiments inside litmus demo
-                        environment.
-    list                List all available Litmus ChaosEngine Experiments
-                        available to run.
-    stop                Shutdown the Cluster with the demo environment
-                        deployed.
-```
-
 ## Startup
 
 To start the GKE cluster and deploy all the required components:
 
 **_for kind cluster_**
 ```bash
-./manage.py start --platform kind 
+./manage.py start --platform kind
 ```
 
 **_for GKE cluster_**
@@ -147,13 +121,70 @@ To run a specific experiment (found under the ./litmus directory):
  <td> Default value is <code>no</code></td>
  </tr>
  </table>
+ 
+ 
+## Docker Container Usage
+ 
+In case you'd like to setup & run the demo from a containerized environment, follow these steps. 
+
+Build Docker container
+```bash
+docker build -t litmuschaos/litmus-demo .
+```
+OR
+```bash
+make build
+```
+
+Run docker container interactive
+[now you can run any commands mentioned here with python3](#usage)
+```bash
+docker run -v /var/run/docker.sock:/var/run/docker.sock --net="host" -it --entrypoint bash litmuschaos/litmus-demo
+$ python3 -h
+```
+OR
+```bash
+make exec
+```
+
+Run commands inside the container {-h, start, test, list, stop} ...
+```bash
+$ ./runcmd -h
+```
+
+## Usage
+
+To see full command-line options use the `-h` flag:
+
+```bash
+./manage.py -h
+```
+
+This will output the following:
+
+```bash
+usage: manage.py [-h] {start,test,list,stop} ...
+
+Spin up Litmus Demo Environment on Kubernetes.
+
+positional arguments:**
+  {start,test,list,stop}
+    start               Start a Cluster with the demo environment deployed.
+    test                Run Litmus ChaosEngine Experiments inside litmus demo
+                        environment.
+    list                List all available Litmus ChaosEngine Experiments
+                        available to run.
+    stop                Shutdown the Cluster with the demo environment
+                        deployed.
+```
+
 
 ### Notes
 
 - To view application deployment picked, success/failure of reconcile operations (i.e., creation of chaos-runner pod or lack thereof), check the chaos operator logs. Ex:
 
 ```bash
-kubectl logs -f chaos-operator-ce-6899bbdb9-jz6jv -n litmus  
+kubectl logs -f chaos-operator-ce-6899bbdb9-jz6jv -n litmus
 ```
 
 - To view the parameters with which the experiment job is created, the status of experiment, the success of chaosengine patch operation, and cleanup of the experiment pod, check the logs of the chaos-runner pod. Ex:
@@ -168,13 +199,13 @@ kubectl logs sock-chaos-runner -n sock-shop
 kubectl logs container-kill-1oo8wv-85lsl -n sock-shop
 ```
 
-(The detailed troubleshooting faq here: https://docs.litmuschaos.io/docs/faq-troubleshooting/) 
+(The detailed troubleshooting faq here: https://docs.litmuschaos.io/docs/faq-troubleshooting/)
 
 - To re-run the chaosexperiment, cleanup and re-create the chaosengine CR
 
 ```bash
 kubectl delete chaosengine sock-chaos -n sock-shop
-kubectl apply -f litmus/chaosengine.yaml 
+kubectl apply -f litmus/chaosengine.yaml
 ```
 
 ## Generate PDF of the experiment result summary
@@ -183,7 +214,7 @@ We can also generate the pdf report of the experiment result summary using <code
 
 ```bash
 ./manage.py test --report=yes
-``` 
+```
 It will generate a pdf report of name `chaos-report.pdf` in the current location containing chaos result summary.
 
 ## List
