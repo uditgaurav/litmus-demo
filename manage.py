@@ -115,10 +115,12 @@ def start(args):
         """
         print_color(f"Setup kind cluster", bcolors.OKBLUE)
 
-        # Installing kind cluster
-        run_shell(f"curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.7.0/kind-$(uname)-amd64")
-        run_shell(f"chmod +x ./kind")
-        run_shell(f"mv ./kind /usr/local/bin/kind")
+        # install kind if not found
+        if not os.path.isfile('/usr/local/bin/kind'):
+            # Installing kind cluster
+            run_shell(f"curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.7.0/kind-$(uname)-amd64")
+            run_shell(f"chmod +x ./kind")
+            run_shell(f"mv ./kind /usr/local/bin/kind")
 
         # Verify the kind installation
         run_shell(f"kind version")

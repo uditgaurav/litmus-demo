@@ -1,0 +1,18 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@0.2.1
+
+jobs:
+    image-build:
+      machine: true
+      steps:
+        - checkout
+        - run:
+            name: Image Build
+            command: make build
+
+workflows:
+  main:
+    jobs:
+      - image-build
