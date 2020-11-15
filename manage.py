@@ -134,8 +134,7 @@ def start(args):
         # Getting the nodes of the cluster
         print_color("\KinD Cluster Running with following nodes:\n")
         run_shell(f"kubectl get nodes\n")
-        run_shell(f"kind get kubeconfig --internal >$HOME/.kube/config")
-
+        
         # Deploy all demo apps
         run_shell("kubectl create -f ./deploy/sock-shop.yaml")
         run_shell("kubectl create -f ./deploy/random-log-counter.yaml")

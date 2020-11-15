@@ -20,7 +20,7 @@ CONTAINER_INSTANCE ?= default
 help:						##Show this help.
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 
-## deps:					Check if docker is installed or not
+## deps: Check if docker is installed or not
 deps: _build_check_docker
 
 _build_check_docker:
@@ -34,21 +34,21 @@ _build_check_docker:
 		&& exit 1; \
 		fi;
 
-## build:				Builds litmus-demo docker Image
+## build: Builds litmus-demo docker image
 build: deps
 	@echo "------------------"
 	@echo "--> Building Litmus-Demo"
 	@docker build -t  $(ORG_NAME)/$(BASE_IMAGE_NAME):$(VERSION) .
 	@echo "------------------"
 
-## exec: 				login to container and run commands
+## exec: Login to container and execute litmus demo commands
 exec:
 	@echo "------------------"
 	@echo "--> Login to Litmus Demo container"
 	@docker run --rm  --name $(BASE_IMAGE_NAME)-$(CONTAINER_INSTANCE) \
 		-v /var/run/docker.sock:/var/run/docker.sock --net="host" \
-		-it --entrypoint bash $(BASE_IMAGE_NAME)
+		-it --entrypoint bash $(ORG_NAME)/$(BASE_IMAGE_NAME)
 
-## stop: 				Stop
+## stop: stops docker container
 stop:
 	@docker stop $(BASE_IMAGE_NAME)-${CONTAINER_INSTANCE}

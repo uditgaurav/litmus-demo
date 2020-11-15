@@ -2,28 +2,49 @@
 
 The purpose of this repository is to familiarize oneself with running litmus chaos experiments in a realistic app environment running multiple services on different Kubernetes clusters.
 
-It makes to spin up a fully deployed [GKE](https://cloud.google.com/kubernetes-engine/) cluster or [EKS](https://aws.amazon.com/eks/) cluster easy with a microservice application or even you can spin up a KinD (Kubernetes-in-Docker) cluster which is a lightweight easy to use and handle for the applications and performing chaos.
+It makes to spin up a fully deployed [GKE](https://cloud.google.com/kubernetes-engine/) cluster or [EKS](https://aws.amazon.com/eks/) cluster easy with a microservice application or even you can spin up a [KinD](https://kind.sigs.k8s.io/docs/user/quick-start/) (Kubernetes-in-Docker) cluster which is a lightweight easy to use and handle for the applications and performing chaos.
 [Sock Shop](https://github.com/microservices-demo/microservices-demo), and
 [Litmus Chaos Engine](https://litmuschaos.io/) to create chaos scenarios.
 
-After cloning this repository, installing the requirements listed below, and using the `start` command to create the fully deployed cluster, you will be able to run Litmus Chaos experiments using the `test` command in the cluster. You can find all the experiment configuration under the `/litmus` directory of this repository and the script to deploy and run them in `manage.py`.
+After cloning this repository, start the litmus demo container, and using the `start` command to create the fully deployed cluster, you will be able to run Litmus Chaos experiments using the `test` command in the cluster. You can find all the experiment configuration under the `/litmus` directory of this repository and the script to deploy and run them in `manage.py`.
 
 It currently works with KinD, GKE and EKS so either you can use a KinD cluster by following the below steps or you would need a Google Cloud account to run this on GKE environment or an AWS account to run this on EKS environment and the support for Azure is planned in future.
 
 ## Requirements
 
-1. Python 3.7 or above
-2. Python Dependencies: `pip install -r requirements.txt`
-3. Google Cloud Login: https://console.cloud.google.com/
-4. GCloud CLI installed locally and logged in: https://cloud.google.com/sdk/docs/quickstarts
-5. AWS CLI installed locally and logged in: https://aws.amazon.com/cli/
-6. eksctl installed locally: https://eksctl.io/
-7. Minimum IAM permissions for your AWS user: https://eksctl.io/usage/minimum-iam-policies/
-8. `create-policy` IAM permissions for your AWS user to create the AWS ALB Ingress Controller IAM policy
-9. Kubectl installed locally: https://kubernetes.io/docs/tasks/tools/install-kubectl/
-10. Helm installed locally: https://helm.sh/docs/intro/install/
-11. Docker installed locally: https://docs.docker.com/engine/install/
+1. Docker 18.09 or greater
 
+## Setup Docker Container  
+You can setup & run the demo from a containerized environment by following the below mentioned steps. 
+
+_Build Docker Image_
+git clone https://github.com/litmuschaos/litmus-demo.git
+
+```bash
+docker build -t litmuschaos/litmus-demo .
+```
+OR
+```bash
+make build
+```
+
+Run docker container interactive, now you can run any commands mentioned [here](#usage) with python3.
+
+```bash
+docker run -v /var/run/docker.sock:/var/run/docker.sock --net="host" -it --entrypoint bash litmuschaos/litmus-demo
+$ python3 -h
+```
+OR
+```bash
+make exec
+```
+
+You can run commands inside the container {-h, start, test, list, stop} ...
+```bash
+$ ./runcmd -h
+```
+
+You can also run the `manage.py` demo script in a non containerized environment for which you have to install the dependencies.You can refer [Get Started with LitmusChaos in Minutes](https://bit.ly/3kZv3KA) blog for setting up non containerized litmus demo environment.
 
 ## Startup
 
@@ -121,36 +142,6 @@ To run a specific experiment (found under the ./litmus directory):
  <td> Default value is <code>no</code></td>
  </tr>
  </table>
- 
- 
-## Docker Container Usage
- 
-In case you'd like to setup & run the demo from a containerized environment, follow these steps. 
-
-Build Docker container
-```bash
-docker build -t litmuschaos/litmus-demo .
-```
-OR
-```bash
-make build
-```
-
-Run docker container interactive
-[now you can run any commands mentioned here with python3](#usage)
-```bash
-docker run -v /var/run/docker.sock:/var/run/docker.sock --net="host" -it --entrypoint bash litmuschaos/litmus-demo
-$ python3 -h
-```
-OR
-```bash
-make exec
-```
-
-Run commands inside the container {-h, start, test, list, stop} ...
-```bash
-$ ./runcmd -h
-```
 
 ## Usage
 
