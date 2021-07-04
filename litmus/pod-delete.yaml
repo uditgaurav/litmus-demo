@@ -4,14 +4,7 @@ metadata:
   name: sock-chaos
   namespace: sock-shop
 spec:
-  # It can be app/infra
-  annotationCheck: 'true'
   engineState: 'active'
-  #ex. values: sock-shop:name=carts
-  auxiliaryAppInfo: ""
-  # It can be delete/retain
-  jobCleanUpPolicy: delete
-  monitoring: true
   appinfo:
     appns: sock-shop
     # FYI, To see app label, apply kubectl get pods --show-labels
@@ -33,5 +26,3 @@ spec:
              # pod failures without '--force' & default terminationGracePeriodSeconds
              - name: FORCE
                value: "false"
-             - name: DEFAULT_GATHERING
-               value: "explicit"

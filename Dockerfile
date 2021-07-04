@@ -14,6 +14,7 @@ WORKDIR ${HOME_DIR}
 RUN apk add --update --no-cache build-base python3-dev python3  jpeg-dev zlib-dev libffi-dev libressl-dev bash git gettext curl  \
  && curl -O https://bootstrap.pypa.io/get-pip.py \
  && python3 get-pip.py \
+ && pip install cryptography==3.3.1 \
  && pip install --upgrade six docker-compose
 
 # install kubectl

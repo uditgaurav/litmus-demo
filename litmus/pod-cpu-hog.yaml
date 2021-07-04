@@ -4,14 +4,7 @@ metadata:
   name: sock-chaos
   namespace: sock-shop
 spec:
-  # It can be true/false
-  annotationCheck: 'false'
-  #ex. values: sock-shop:name=carts
-  auxiliaryAppInfo: ""
   engineState: 'active'
-  # It can be delete/retain
-  jobCleanUpPolicy: delete
-  monitoring: true
   appinfo:
     appns: sock-shop
     # FYI, To see app label, apply kubectl get pods --show-labels
@@ -41,4 +34,4 @@ spec:
               value: 'md5sum /dev/zero'
         
             - name: CHAOS_KILL_COMMAND
-              value: "kill -9 $(ps afx | grep \"[md5sum] /dev/zero\" | awk '{print$1}' | tr '\n' ' ')"              
+              value: "kill -9 $(ps afx | grep \"[md5sum] /dev/zero\" | awk '{print$1}' | tr '\n' ' ')"

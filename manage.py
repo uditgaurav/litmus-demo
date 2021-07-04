@@ -72,13 +72,13 @@ def start(args):
         run_shell("kubectl create -f ./deploy/random-log-counter.yaml")
 
         # Deploy Litmus ChaosOperator to run Experiments that create incidents
-        run_shell("kubectl apply -f https://litmuschaos.github.io/litmus/litmus-operator-v1.9.0.yaml")
+        run_shell("kubectl apply -f https://litmuschaos.github.io/litmus/litmus-operator-v1.13.6.yaml")
 
         # Install Litmus Experiments - TEMP Workaround to set experiment versions until Chaos Hub supports in URL
-        run_shell("curl -sL https://github.com/litmuschaos/chaos-charts/archive/1.9.0.tar.gz -o litmus.tar.gz")
+        run_shell("curl -sL https://github.com/litmuschaos/chaos-charts/archive/1.13.7.tar.gz -o litmus.tar.gz")
         run_shell("tar -zxvf litmus.tar.gz")
         run_shell("rm litmus.tar.gz")
-        run_shell("find chaos-charts-1.9.0 -name experiments.yaml | grep generic | xargs kubectl apply -n sock-shop -f")
+        run_shell("find chaos-charts-1.13.7 -name experiments.yaml | grep generic | xargs kubectl apply -n sock-shop -f")
         #run_shell("kubectl create -f https://hub.litmuschaos.io/api/chaos?file=charts/generic/experiments.yaml -n sock-shop")
         #run_shell("kubectl create -f https://hub.litmuschaos.io/api/chaos?file=charts/kafka/experiments.yaml -n kafka")
 
@@ -118,7 +118,7 @@ def start(args):
         # install kind if not found
         if not os.path.isfile('/usr/local/bin/kind'):
             # Installing kind cluster
-            run_shell(f"curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.7.0/kind-$(uname)-amd64")
+            run_shell(f"curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-$(uname)-amd64")
             run_shell(f"chmod +x ./kind")
             run_shell(f"mv ./kind /usr/local/bin/kind")
 
@@ -128,7 +128,7 @@ def start(args):
         print_color(f"Starting single node {args.platform} cluster with default name kind", bcolors.OKBLUE)
 
         # Start a single node kind cluster
-        run_shell(f"kind create cluster --config kind-setup/kind-config.yaml --loglevel debug --wait=5m")
+        run_shell(f"kind create cluster --config kind-setup/kind-config.yaml --wait=5m")
         run_shell(f"kubectl cluster-info --context kind-kind")
 
         # Getting the nodes of the cluster
@@ -140,13 +140,13 @@ def start(args):
         run_shell("kubectl create -f ./deploy/random-log-counter.yaml")
 
         # Deploy Litmus ChaosOperator to run Experiments that create incidents
-        run_shell("kubectl apply -f https://litmuschaos.github.io/litmus/litmus-operator-v1.9.0.yaml")
+        run_shell("kubectl apply -f https://litmuschaos.github.io/litmus/litmus-operator-v1.13.6.yaml")
 
         # Install Litmus Experiments - TEMP Workaround to set experiment versions until Chaos Hub supports in URL
-        run_shell("curl -sL https://github.com/litmuschaos/chaos-charts/archive/1.9.0.tar.gz -o litmus.tar.gz")
+        run_shell("curl -sL https://github.com/litmuschaos/chaos-charts/archive/1.13.7.tar.gz -o litmus.tar.gz")
         run_shell("tar -zxvf litmus.tar.gz")
         run_shell("rm litmus.tar.gz")
-        run_shell("find chaos-charts-1.9.0 -name experiments.yaml | grep generic | xargs kubectl apply -n sock-shop -f")
+        run_shell("find chaos-charts-1.13.7 -name experiments.yaml | grep generic | xargs kubectl apply -n sock-shop -f")
 
         # Create the chaos serviceaccount with permissions needed to run the generic K8s experiments
         run_shell("kubectl create -f ./deploy/litmus-rbac.yaml")
@@ -193,13 +193,13 @@ def start(args):
         run_shell("kubectl create -f ./deploy/random-log-counter.yaml")
 
         # Deploy Litmus ChaosOperator to run Experiments that create incidents
-        run_shell("kubectl apply -f https://litmuschaos.github.io/litmus/litmus-operator-v1.9.0.yaml")
+        run_shell("kubectl apply -f https://litmuschaos.github.io/litmus/litmus-operator-v1.13.6.yaml")
 
         # Install Litmus Experiments - TEMP Workaround to set experiment versions until Chaos Hub supports in URL
-        run_shell("curl -sL https://github.com/litmuschaos/chaos-charts/archive/1.9.0.tar.gz -o litmus.tar.gz")
+        run_shell("curl -sL https://github.com/litmuschaos/chaos-charts/archive/1.13.7.tar.gz -o litmus.tar.gz")
         run_shell("tar -zxvf litmus.tar.gz")
         run_shell("rm litmus.tar.gz")
-        run_shell("find chaos-charts-1.9.0 -name experiments.yaml | grep generic | xargs kubectl apply -n sock-shop -f")
+        run_shell("find chaos-charts-1.13.7 -name experiments.yaml | grep generic | xargs kubectl apply -n sock-shop -f")
         #run_shell("kubectl create -f https://hub.litmuschaos.io/api/chaos?file=charts/generic/experiments.yaml -n sock-shop")
         #run_shell("kubectl create -f https://hub.litmuschaos.io/api/chaos?file=charts/kafka/experiments.yaml -n kafka")
 
